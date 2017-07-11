@@ -255,6 +255,9 @@
 				<version>2.19</version>
 				<configuration>
 					<redirectTestOutputToFile>true</redirectTestOutputToFile>
+					<suiteXmlFiles>
+						<suiteXmlFile>testng.xml</suiteXmlFile>
+					</suiteXmlFiles>
 				</configuration>
 			</plugin>
 
