@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.zavtech.quandl;
+package com.zavtech.morpheus.quandl;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -28,21 +28,22 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Consumer;
 import java.util.zip.ZipFile;
 
-import static com.zavtech.quandl.QuandlField.COLUMN_NAMES;
-import static com.zavtech.quandl.QuandlField.DATABASE_CODE;
-import static com.zavtech.quandl.QuandlField.DATABASE_ID;
-import static com.zavtech.quandl.QuandlField.DATASET_CODE;
-import static com.zavtech.quandl.QuandlField.DATASET_ID;
-import static com.zavtech.quandl.QuandlField.DATASET_TYPE;
-import static com.zavtech.quandl.QuandlField.DESCRIPTION;
-import static com.zavtech.quandl.QuandlField.END_DATE;
-import static com.zavtech.quandl.QuandlField.FREQUENCY;
-import static com.zavtech.quandl.QuandlField.LAST_REFRESH_TIME;
-import static com.zavtech.quandl.QuandlField.NAME;
-import static com.zavtech.quandl.QuandlField.PREMIUM;
-import static com.zavtech.quandl.QuandlField.START_DATE;
+import static com.zavtech.morpheus.quandl.QuandlField.COLUMN_NAMES;
+import static com.zavtech.morpheus.quandl.QuandlField.DATABASE_CODE;
+import static com.zavtech.morpheus.quandl.QuandlField.DATABASE_ID;
+import static com.zavtech.morpheus.quandl.QuandlField.DATASET_CODE;
+import static com.zavtech.morpheus.quandl.QuandlField.DATASET_ID;
+import static com.zavtech.morpheus.quandl.QuandlField.DATASET_TYPE;
+import static com.zavtech.morpheus.quandl.QuandlField.DESCRIPTION;
+import static com.zavtech.morpheus.quandl.QuandlField.END_DATE;
+import static com.zavtech.morpheus.quandl.QuandlField.FREQUENCY;
+import static com.zavtech.morpheus.quandl.QuandlField.LAST_REFRESH_TIME;
+import static com.zavtech.morpheus.quandl.QuandlField.NAME;
+import static com.zavtech.morpheus.quandl.QuandlField.PREMIUM;
+import static com.zavtech.morpheus.quandl.QuandlField.START_DATE;
 
 import com.zavtech.morpheus.array.Array;
 import com.zavtech.morpheus.frame.DataFrame;
@@ -60,7 +61,7 @@ import com.zavtech.morpheus.util.Json;
  *
  * <p><strong>This is open source software released under the <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache 2.0 License</a></strong></p>
  */
-public class QuandlSource<R,C> implements DataFrameSource<R,C,QuandlOptions<R,C>> {
+public class QuandlSource<R,C> extends DataFrameSource<R,C,QuandlOptions<R,C>> {
 
     private String apiKey;
     private String baseUrl;
@@ -110,14 +111,10 @@ public class QuandlSource<R,C> implements DataFrameSource<R,C,QuandlOptions<R,C>
 
 
     @Override
-    public <T extends Options<?,?>> boolean isSupported(T options) {
-        return options instanceof QuandlOptions;
-    }
-
-    @Override
     @SuppressWarnings("unchecked")
-    public DataFrame<R, C> read(QuandlOptions options) throws DataFrameException {
-        switch (Options.validate(options).getOperation()) {
+    public DataFrame<R,C> read(Consumer<QuandlOptions<R, C>> configurator) throws DataFrameException {
+        final QuandlOptions options = initOptions(new QuandlOptions<>(), configurator);
+        switch (options.getOperation()) {
             case DATA:      return (DataFrame<R,C>)getData(options);
             case DATASETS:  return (DataFrame<R,C>)getDatasets(options);
             case DATABASES: return (DataFrame<R,C>)getDatabases(options);
@@ -221,8 +218,8 @@ public class QuandlSource<R,C> implements DataFrameSource<R,C,QuandlOptions<R,C>
                         throw new RuntimeException("Failed to extract content from zip file", ex);
                     }
                 });
-                final DataFrame<String,String> union = DataFrame.union(frameList);
-                return union.cols().mapKeys(column -> QuandlField.of(column.key()));
+                final DataFrame<String,String> combined = DataFrame.combineFirst(frameList);
+                return combined.cols().mapKeys(column -> QuandlField.of(column.key()));
             }
         } catch (Exception ex) {
             throw new QuandlException("Failed to load dataset listing from Quandl for " + request, ex);
@@ -253,8 +250,8 @@ public class QuandlSource<R,C> implements DataFrameSource<R,C,QuandlOptions<R,C>
                 if (frame.rowCount() == 0) break;
                 frameList.add(frame);
             }
-            final DataFrame<Integer,String> union = DataFrame.union(frameList);
-            return union.cols().mapKeys(column -> QuandlField.of(column.key()));
+            final DataFrame<Integer,String> combined = DataFrame.combineFirst(frameList);
+            return combined.cols().mapKeys(column -> QuandlField.of(column.key()));
         } catch (Exception ex) {
             throw new QuandlException("Failed to load database list from Quandl: " + ex.getMessage(), ex);
         }

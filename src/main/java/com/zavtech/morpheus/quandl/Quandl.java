@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.zavtech.quandl;
+package com.zavtech.morpheus.quandl;
 
 import java.time.LocalDate;
 import java.util.function.Consumer;
 
 import com.zavtech.morpheus.frame.DataFrame;
+import com.zavtech.morpheus.frame.DataFrameSource;
 
 /**
  * A convenience class that provides a high level API to load both meta-data and data from Quandl.com
@@ -47,7 +48,8 @@ public class Quandl {
      * @param apiKey    the API key to access Quandl
      */
     public Quandl(String baseUrl, String apiKey) {
-        DataFrame.read().register(new QuandlSource(baseUrl, apiKey));
+        this.source = new QuandlSource<>(baseUrl, apiKey);
+        DataFrameSource.register(source);
     }
 
     /**
@@ -57,7 +59,7 @@ public class Quandl {
      */
     @SuppressWarnings("unchecked")
     public DataFrame<Integer,QuandlField> getDatabaseListing() throws QuandlException {
-        return DataFrame.read().apply(QuandlOptions.class, options -> {
+        return (DataFrame<Integer,QuandlField>)source.read(options -> {
             options.setOperation(QuandlOptions.Operation.DATABASES);
         });
     }
@@ -70,7 +72,7 @@ public class Quandl {
      */
     @SuppressWarnings("unchecked")
     public DataFrame<String,QuandlField> getDatasetListing(String database) throws QuandlException {
-        return DataFrame.read().apply(QuandlOptions.class, options -> {
+        return (DataFrame<String,QuandlField>)source.read(options -> {
             options.setOperation(QuandlOptions.Operation.DATASETS);
             options.setDatabase(database);
         });
@@ -84,7 +86,7 @@ public class Quandl {
      */
     @SuppressWarnings("unchecked")
     public DataFrame<String,QuandlField> getMetaData(String database, String dataset) throws QuandlException {
-        return DataFrame.read().apply(QuandlOptions.class, options -> {
+        return (DataFrame<String,QuandlField>)source.read(options -> {
             options.setOperation(QuandlOptions.Operation.META_DATA);
             options.setDatabase(database);
             options.setDataset(dataset);
@@ -100,7 +102,7 @@ public class Quandl {
      */
     @SuppressWarnings("unchecked")
     public DataFrame<LocalDate,String> getDailyData(String database, String dataset, Consumer<QuandlOptions> configurator) throws QuandlException {
-        return DataFrame.read().apply(QuandlOptions.class, options -> {
+        return (DataFrame<LocalDate,String>)source.read(options -> {
             options.setOperation(QuandlOptions.Operation.DATA);
             options.setDatabase(database);
             options.setDataset(dataset);
