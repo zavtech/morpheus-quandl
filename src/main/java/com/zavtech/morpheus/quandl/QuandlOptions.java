@@ -13,15 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.zavtech.quandl;
+package com.zavtech.morpheus.quandl;
 
 import java.time.LocalDate;
 import java.util.Optional;
-import java.util.function.Consumer;
 
 import com.zavtech.morpheus.frame.DataFrameSource;
 import com.zavtech.morpheus.util.Asserts;
-import com.zavtech.morpheus.util.Initialiser;
 
 /**
  * A generic request descriptor to load various kinds of data and meta-data from Quandl.

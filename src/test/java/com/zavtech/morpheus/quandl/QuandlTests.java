@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.zavtech.quandl;
+package com.zavtech.morpheus.quandl;
 
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
@@ -24,7 +24,7 @@ import com.zavtech.morpheus.frame.DataFrame;
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
-import static com.zavtech.quandl.QuandlField.*;
+import static com.zavtech.morpheus.quandl.QuandlField.*;
 
 /**
  * A unit test for testing the Quandl download adapter
@@ -40,18 +40,18 @@ public class QuandlTests {
     @DataProvider(name="wiki")
     public Object[][] wiki() {
         return new Object[][] {
-                {"AAPL", 12},
-                {"MSFT", 12},
-                {"GE", 12}
+            {"AAPL", 12},
+            {"MSFT", 12},
+            {"GE", 12}
         };
     }
 
     @DataProvider(name="metadata")
     public Object[][] metadata() {
         return new Object[][] {
-                {"WIKI", "AAPL"},
-                {"FRED", "GBP3MTD156N"},
-                {"CBOE", "VIX"}
+            {"WIKI", "AAPL"},
+            {"FRED", "GBP3MTD156N"},
+            {"CBOE", "VIX"}
         };
     }
 
@@ -59,9 +59,9 @@ public class QuandlTests {
     @DataProvider(name="libor")
     public Object[][] fredLibor() {
         return new Object[][] {
-                {"CAD3MTD156N", 1},
-                {"AUD3MTD156N", 1},
-                {"GBP3MTD156N", 1}
+            {"CAD3MTD156N", 1},
+            {"AUD3MTD156N", 1},
+            {"GBP3MTD156N", 1}
         };
     }
 

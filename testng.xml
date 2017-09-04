@@ -4,7 +4,7 @@
 
   <test name="Quandl Basic Tests">
     <packages>
-      <package name="com.zavtech.quandl.*"/>
+      <package name="com.zavtech.morpheus.quandl.*"/>
     </packages>
   </test>
 
