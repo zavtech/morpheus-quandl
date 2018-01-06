@@ -79,7 +79,7 @@ public class QuandlTests {
         Assert.assertEquals(frame.cols().type(DOWNLOADS), Long.class);
         Assert.assertEquals(frame.cols().type(PREMIUM), Boolean.class);
         Assert.assertEquals(frame.cols().type(IMAGE_URL), String.class);
-        Assert.assertTrue(frame.colAt(DATABASE_CODE).values().filter(v -> !v.isNull() && v.getValue().equals("WIKI")).count() > 0);
+        Assert.assertTrue(frame.col(DATABASE_CODE).values().filter(v -> !v.isNull() && v.getValue().equals("WIKI")).count() > 0);
     }
 
 
@@ -94,7 +94,7 @@ public class QuandlTests {
         Assert.assertEquals(frame.cols().type(DATABASE_CODE), String.class);
         Assert.assertEquals(frame.cols().type(DESCRIPTION), String.class);
         Assert.assertTrue(frame.rows().select(row -> row.key().contains("AAPL")).rowCount() > 0);
-        frame.colAt(DATABASE_CODE).values().forEach(v -> Assert.assertEquals(v.getValue(), databaseCode));
+        frame.col(DATABASE_CODE).values().forEach(v -> Assert.assertEquals(v.getValue(), databaseCode));
         frame.out().print();
     }
 
